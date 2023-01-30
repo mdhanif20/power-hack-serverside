@@ -17,12 +17,12 @@ async function run(){
     try{
      await client.connect();
      const database = client.db("PowerHack");
-     const newsCollection = database.collection("bullingInfo");
+     const billingCollection = database.collection("bullingInfo");
      const usersCollection = database.collection("users");
 
         //get billing info added pagination
         app.get("/api/billing-list", async(req,res)=>{
-            const loadBill = newsCollection.find({});
+            const loadBill = billingCollection.find({});
             const page = req.query.page;
             const size = parseInt(req.query.size);
             const count = await loadBill.count();
@@ -40,14 +40,14 @@ async function run(){
         //billing information added
         app.post("/api/add-billing",async(req,res)=>{
           const bill = req.body;
-          const result = await newsCollection.insertOne(bill);
+          const result = await billingCollection.insertOne(bill);
           res.json(result)
         })
 
         //searched value filtration based on name or phone number or email
         app.get("/api/billing-list/:searched",async(req,res)=>{
             const search = req.params.searched;
-            const loadBilling = newsCollection.find({});
+            const loadBilling = billingCollection.find({});
             const allBilling = await loadBilling.toArray();
             let filteredData = allBilling.filter(billing => {
                 return billing.name.includes(search) || billing.email.includes(search) || billing.phone.includes(search);
@@ -57,7 +57,7 @@ async function run(){
 
         //total paid amound calculation
         app.get("/api/billing",async(req,res)=>{
-          const loadBill = newsCollection.find({});
+          const loadBill = billingCollection.find({});
           let total = 0;
           const sum = await loadBill.toArray();
           await sum.forEach(item =>{
@@ -70,7 +70,7 @@ async function run(){
         app.delete("/api/delete-billing/:id", async(req,res)=>{
             const id = req.params.id;
             const query = { _id: ObjectId(id) }
-            const result =  await newsCollection.deleteOne(query)
+            const result =  await billingCollection.deleteOne(query)
             res.json(result)
         })
 
@@ -108,7 +108,7 @@ async function run(){
                   paidAmount: bill.paidAmount
                 },
               };
-            const result = await newsCollection.updateOne(filter,updateDoc,options)
+            const result = await billingCollection.updateOne(filter,updateDoc,options)
             res.json(result)
         })
     
